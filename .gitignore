@@ -1,0 +1,15 @@
+# 依赖（克隆后 npm install 即可，不入库）
+node_modules/
+
+# 重构前旧版源码备份（仅本地留档）
+orchard-web/.baseline-src/
+
+# 构建与日志
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/

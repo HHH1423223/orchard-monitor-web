@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>风格原型 D · 深色玻璃拟态</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+/* ===================================================================
+   风格 D · 深色玻璃拟态（Glassmorphism / Spatial）
+   设计主张：背景有空间、卡片是玻璃、数据会发光。
+   =================================================================== */
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --mint:#3ee9b0;
+  --aqua:#4fd6ff;
+  --violet:#a78bfa;
+  --amber:#ffc247;
+  --rose:#ff6b81;
+  --ink:#eef4fb;
+  --ink-2:#a8bdd6;
+  --ink-3:#6d84a3;
+  --glass:rgba(255,255,255,.055);
+  --glass-2:rgba(255,255,255,.085);
+  --stroke:rgba(255,255,255,.11);
+  --stroke-2:rgba(255,255,255,.18);
+}
+
+html,body{height:100%}
+body{
+  background:#05070f;
+  color:var(--ink);
+  font-family:"Microsoft YaHei","PingFang SC",-apple-system,"Segoe UI",sans-serif;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- 空间背景：三团光晕 + 网格 ---------- */
+.space{position:fixed;inset:0;z-index:0;overflow:hidden}
+.space .grid-bg{
+  position:absolute;inset:-2px;
+  background-image:
+    linear-gradient(rgba(120,180,255,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(120,180,255,.055) 1px,transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(ellipse 100% 70% at 50% 30%,#000 20%,transparent 78%);
+}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;animation:drift 22s ease-in-out infinite}
+.orb.o1{width:820px;height:820px;left:-220px;top:-260px;background:radial-gradient(circle,#1f8f7a,transparent 68%)}
+.orb.o2{width:700px;height:700px;right:-180px;top:-120px;background:radial-gradient(circle,#1d5fa8,transparent 68%);animation-delay:-7s}
+.orb.o3{width:640px;height:640px;left:38%;bottom:-320px;background:radial-gradient(circle,#6d3fa8,transparent 70%);opacity:.38;animation-delay:-13s}
+@keyframes drift{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  50%{transform:translate3d(40px,34px,0) scale(1.09)}
+}
+
+/* ---------- 布局 ---------- */
+.shell{position:relative;z-index:1;display:flex;min-height:100vh}
+
+/* ---------- 玻璃侧栏 ---------- */
+.side{
+  width:246px;flex:0 0 246px;padding:22px 16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
+  backdrop-filter:blur(24px) saturate(160%);
+  -webkit-backdrop-filter:blur(24px) saturate(160%);
+  border-right:1px solid var(--stroke);
+  display:flex;flex-direction:column;gap:26px;
+}
+.logo-row{display:flex;align-items:center;gap:12px;padding:0 6px}
+.logo-mark{
+  width:42px;height:42px;border-radius:13px;flex:0 0 42px;
+  background:linear-gradient(140deg,var(--mint),var(--aqua));
+  display:grid;place-items:center;font-weight:800;font-size:19px;color:#032028;
+  box-shadow:0 8px 26px rgba(62,233,176,.36),inset 0 1px 0 rgba(255,255,255,.5);
+}
+.logo-txt b{display:block;font-size:15px;letter-spacing:.4px}
+.logo-txt span{font-size:11.5px;color:var(--ink-3)}
+
+.menu{display:flex;flex-direction:column;gap:5px}
+.menu a{
+  display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:12px;
+  color:var(--ink-2);text-decoration:none;font-size:14px;
+  transition:.22s cubic-bezier(.4,0,.2,1);position:relative;
+}
+.menu a .ico{width:18px;text-align:center;font-size:15px;opacity:.9}
+.menu a:hover{background:var(--glass-2);color:var(--ink);transform:translateX(2px)}
+.menu a.on{
+  color:#04191a;font-weight:700;
+  background:linear-gradient(120deg,var(--mint),#5ce7d0);
+  box-shadow:0 10px 30px -8px rgba(62,233,176,.62);
+}
+.menu a .num{
+  margin-left:auto;font-size:11px;padding:1px 7px;border-radius:8px;
+  background:var(--rose);color:#fff;font-weight:700;
+}
+.side-foot{
+  margin-top:auto;padding:14px;border-radius:14px;
+  background:var(--glass);border:1px solid var(--stroke);
+  font-size:11.5px;color:var(--ink-3);line-height:1.7;
+}
+
+/* ---------- 主区 ---------- */
+.main{flex:1;min-width:0;padding:22px 26px 34px;display:flex;flex-direction:column;gap:18px}
+
+.top{display:flex;align-items:center;gap:16px}
+.top h1{font-size:23px;font-weight:700;letter-spacing:-.4px}
+.top .sub{font-size:12.5px;color:var(--ink-3);margin-top:3px}
+.pill{
+  padding:5px 13px;border-radius:999px;font-size:12px;
+  background:var(--glass-2);border:1px solid var(--stroke-2);color:var(--ink-2);
+  backdrop-filter:blur(10px);
+}
+.pill.live{color:var(--mint);border-color:rgba(62,233,176,.4);background:rgba(62,233,176,.1)}
+.pill.live::before{
+  content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--mint);margin-right:7px;vertical-align:1px;
+  box-shadow:0 0 9px var(--mint);animation:pulse 1.8s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.75)}}
+.top .grow{flex:1}
+
+.avatar{
+  display:flex;align-items:center;gap:9px;padding:5px 14px 5px 5px;border-radius:999px;
+  background:var(--glass-2);border:1px solid var(--stroke-2);backdrop-filter:blur(10px);
+}
+.avatar .face{
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(140deg,var(--violet),var(--aqua));
+  display:grid;place-items:center;font-size:13px;font-weight:700;color:#0a0f1e;
+}
+
+/* ---------- 玻璃卡 ---------- */
+.glass{
+  position:relative;border-radius:20px;padding:18px 20px;
+  background:linear-gradient(150deg,rgba(255,255,255,.085),rgba(255,255,255,.028));
+  border:1px solid var(--stroke);
+  backdrop-filter:blur(26px) saturate(170%);
+  -webkit-backdrop-filter:blur(26px) saturate(170%);
+  box-shadow:0 20px 50px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.13);
+  overflow:hidden;
+}
+/* 玻璃高光：左上角一道斜光，是玻璃拟态的关键细节 */
+.glass::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(125deg,rgba(255,255,255,.14),transparent 42%);
+}
+
+.alert-bar{
+  display:flex;align-items:center;gap:12px;padding:13px 18px;border-radius:16px;
+  font-size:13.5px;
+  background:linear-gradient(100deg,rgba(255,194,71,.16),rgba(255,194,71,.04));
+  border:1px solid rgba(255,194,71,.34);
+  color:#ffd98a;backdrop-filter:blur(14px);
+}
+.alert-bar .ico{font-size:16px}
+.alert-bar b{color:#fff}
+.alert-bar .grow{flex:1}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.kpi{padding:19px 20px 17px}
+.kpi .cap{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2)}
+.kpi .cap .dotm{width:7px;height:7px;border-radius:50%;background:var(--mint);box-shadow:0 0 9px var(--mint)}
+.kpi .big{
+  font-size:40px;font-weight:800;letter-spacing:-1.6px;line-height:1.1;margin:8px 0 2px;
+  font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,#fff,#9fd9c8);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.kpi .big .u{font-size:15px;font-weight:600;letter-spacing:0;margin-left:3px;-webkit-text-fill-color:var(--ink-2)}
+.kpi .ft{font-size:12px;color:var(--ink-3)}
+.kpi .glow{position:absolute;right:-40px;top:-50px;width:150px;height:150px;border-radius:50%;filter:blur(42px);opacity:.5}
+.kpi.m .glow{background:var(--mint)}
+.kpi.a .glow{background:var(--amber)}
+.kpi.b .glow{background:var(--aqua)}
+.kpi.v .glow{background:var(--violet)}
+.kpi.m .big{background:linear-gradient(180deg,#fff,#5df0bd);-webkit-background-clip:text;background-clip:text}
+.kpi.a .big{background:linear-gradient(180deg,#fff,#ffd27a);-webkit-background-clip:text;background-clip:text}
+.kpi.v .big{background:linear-gradient(180deg,#fff,#c9b6ff);-webkit-background-clip:text;background-clip:text}
+
+/* ---------- 两栏 ---------- */
+.row2{display:grid;grid-template-columns:1.45fr 1fr;gap:16px}
+.row3{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+.card-h{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.card-h h3{font-size:15px;font-weight:700;letter-spacing:-.2px}
+.card-h .tagl{font-size:11.5px;color:var(--ink-3)}
+.card-h .grow{flex:1}
+
+/* ---------- 气象小格 ---------- */
+.wx{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;margin-bottom:12px}
+.wx .cell{
+  padding:11px 13px;border-radius:13px;background:var(--glass-2);border:1px solid var(--stroke);
+}
+.wx .cell .l{font-size:11.5px;color:var(--ink-3)}
+.wx .cell .v{font-size:22px;font-weight:700;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+.wx .cell .v small{font-size:11.5px;font-weight:500;color:var(--ink-3);margin-left:2px}
+.wch{display:flex;justify-content:space-between;padding:0 2px;margin-bottom:2px}
+.lgd{font-size:10.5px;color:var(--ink-3);display:inline-flex;align-items:center;gap:4px}
+.lgd i{width:8px;height:8px;border-radius:2px;display:inline-block}
+
+/* ---------- 点位 ---------- */
+.pts{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:11px}
+.pt{
+  position:relative;padding:13px 14px;border-radius:15px;cursor:pointer;
+  background:linear-gradient(150deg,rgba(255,255,255,.075),rgba(255,255,255,.022));
+  border:1px solid var(--stroke);
+  transition:.24s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+.pt:hover{transform:translateY(-3px);border-color:var(--stroke-2);box-shadow:0 16px 34px -14px rgba(0,0,0,.8)}
+.pt .bar{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--mint)}
+.pt.warn .bar{background:var(--amber)}
+.pt.low .bar{background:var(--rose)}
+.pt.off{opacity:.5;border-style:dashed}
+.pt .r1{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-2)}
+.pt .r1 .dot{width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint)}
+.pt.warn .r1 .dot{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+.pt.low .r1 .dot{background:var(--rose);box-shadow:0 0 8px var(--rose)}
+.pt .val{font-size:27px;font-weight:800;letter-spacing:-1.1px;font-variant-numeric:tabular-nums;margin:2px 0}
+.pt .val small{font-size:12px;font-weight:600;letter-spacing:0;color:var(--ink-3);margin-left:2px}
+.pt.warn .val{color:var(--amber)}
+.pt.low .val{color:var(--rose)}
+.pt .r2{font-size:11px;color:var(--ink-3);display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:3px}
+.pt .r2 .rt{opacity:.8;white-space:nowrap}
+.spark{display:block;flex:0 0 auto}
+.spark svg{display:block}
+
+/* ---------- 报警行 ---------- */
+.al{border-radius:14px;padding:12px 14px;margin-bottom:9px;background:var(--glass-2);border:1px solid var(--stroke);position:relative;overflow:hidden}
+.al::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--amber)}
+.al.crit::before{background:var(--rose)}
+.al .t1{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2)}
+.al .chip{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:6px;background:rgba(255,194,71,.18);color:var(--amber)}
+.al.crit .chip{background:rgba(255,107,129,.18);color:var(--rose)}
+.al .t1 b{color:var(--ink)}
+.al .t2{font-size:12.5px;color:#cfdcec;margin-top:4px}
+.al .t2 .n{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.foot{text-align:center;font-size:11.5px;color:var(--ink-3);padding:6px 0 0}
+</style>
+</head>
+<body>
+
+<div class="space">
+  <div class="grid-bg"></div>
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+
+<div class="shell">
+  <!-- ========== 侧栏 ========== -->
+  <aside class="side">
+    <div class="logo-row">
+      <div class="logo-mark">果</div>
+      <div class="logo-txt">
+        <b>山地果园平台</b>
+        <span>刺梨 · 监测与灌溉</span>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <a class="on"><span class="ico">◉</span>实时监测</a>
+      <a><span class="ico">⬡</span>设备列表</a>
+      <a><span class="ico">◫</span>历史曲线</a>
+      <a><span class="ico">⏻</span>灌溉控制</a>
+      <a><span class="ico">◔</span>报警中心<span class="num">4</span></a>
+    </nav>
+
+    <div class="side-foot">
+      ××刺梨种植专业合作社<br>
+      GZLL01 · 26 亩 · 海拔 1280m<br>
+      <span style="color:var(--amber)">演示数据 · 未接真实设备</span>
+    </div>
+  </aside>
+
+  <!-- ========== 主区 ========== -->
+  <main class="main">
+    <div class="top">
+      <div>
+        <h1>实时监测</h1>
+        <div class="sub">黔南 · 刺梨示范园　东坡，平均坡度 22°</div>
+      </div>
+      <div class="grow"></div>
+      <span class="pill live">数据实时更新</span>
+      <span class="pill">2026-09-29 11:32:08</span>
+      <div class="avatar"><span class="face">张</span>张工</div>
+    </div>
+
+    <div class="alert-bar">
+      <span class="ico">⚠</span>
+      <span><b>告警</b>　N09（西坡 · 水池边）20cm 土壤水分低于 25%，当前 <b>24.7</b>，阈值 &lt; 25</span>
+      <span class="grow"></span>
+      <span style="opacity:.75">等共 4 条</span>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpis">
+      <div class="glass kpi m">
+        <div class="glow"></div>
+        <div class="cap"><span class="dotm"></span>设备在线</div>
+        <div class="big">10<span class="u">/ 11</span></div>
+        <div class="ft">在线率 91% · 3 周期判离线</div>
+      </div>
+      <div class="glass kpi a">
+        <div class="glow"></div>
+        <div class="cap"><span class="dotm" style="background:var(--amber);box-shadow:0 0 9px var(--amber)"></span>活动告警</div>
+        <div class="big">4<span class="u">条</span></div>
+        <div class="ft">最新：N09 土壤水分</div>
+      </div>
+      <div class="glass kpi b">
+        <div class="glow"></div>
+        <div class="cap"><span class="dotm" style="background:var(--aqua);box-shadow:0 0 9px var(--aqua)"></span>平均土壤水分</div>
+        <div class="big">27.6<span class="u">%</span></div>
+        <div class="ft">最低 N03 22.5%</div>
+      </div>
+      <div class="glass kpi v">
+        <div class="glow"></div>
+        <div class="cap"><span class="dotm" style="background:var(--violet);box-shadow:0 0 9px var(--violet)"></span>水池液位</div>
+        <div class="big">74.5<span class="u">%</span></div>
+        <div class="ft">低于 20% 禁止启泵</div>
+      </div>
+    </div>
+
+    <!-- 图 + 气象 -->
+    <div class="row2">
+      <div class="glass">
+        <div class="card-h">
+          <h3>土壤水分趋势</h3>
+          <span class="tagl">20cm 层 · 近 6 小时 · 9 个点位</span>
+          <span class="grow"></span>
+          <span class="tagl">每 10 分钟上报</span>
+        </div>
+        <div id="chart-soil" style="height:268px"></div>
+      </div>
+
+      <div class="glass">
+        <div class="card-h">
+          <h3>园区气象</h3>
+          <span class="tagl">一园一站 W01</span>
+        </div>
+        <div class="wx">
+          <div class="cell"><div class="l">空气温度</div><div class="v">18.4<small>℃</small></div></div>
+          <div class="cell"><div class="l">空气湿度</div><div class="v">87.2<small>%</small></div></div>
+          <div class="cell"><div class="l">今日降雨</div><div class="v">6.8<small>mm</small></div></div>
+          <div class="cell"><div class="l">光照</div><div class="v">12.4<small>klx</small></div></div>
+        </div>
+        <div class="wch">
+          <div class="wch-l">
+            <span class="lgd"><i style="background:#ffc247"></i>气温 ℃</span>
+            <span class="lgd"><i style="background:#4fd6ff"></i>湿度 %</span>
+          </div>
+          <div class="wch-r">
+            <span class="lgd"><i style="background:rgba(79,214,255,.6)"></i>降雨 mm</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div id="chart-wx" style="flex:1;min-width:0;height:124px"></div>
+          <div id="chart-rain" style="width:74px;flex:0 0 74px;height:124px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 点位 + 报警 -->
+    <div class="row3">
+      <div class="glass">
+        <div class="card-h">
+          <h3>墒情点位</h3>
+          <span class="tagl">坡顶 3 · 坡中 3 · 洼地 2 · 水池边 1</span>
+        </div>
+        <div class="pts" id="pts"></div>
+      </div>
+
+      <div class="glass">
+        <div class="card-h"><h3>最近报警</h3><span class="grow"></span><span class="tagl">全部 ›</span></div>
+        <div id="als"></div>
+      </div>
+    </div>
+
+    <div class="foot">演示版本 · 数据由模拟引擎生成，未接入真实设备</div>
+  </main>
+</div>
+
+<script>
+/* ============ 数据与工具 ============ */
+const N = (s => () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296)(20260929);
+const r1 = v => Math.round(v * 10) / 10;
+const seg = (n, base, drift) => {
+  const out = []; let v = base;
+  for (let i = 0; i < n; i++) { v += (N() - 0.5) * drift; out.push(r1(v)); }
+  return out;
+};
+
+const POINTS = [
+  { sn:'N01', loc:'东坡 · 坡顶', mo:27.5, ph:6.39, st:'ok' },
+  { sn:'N02', loc:'东坡 · 坡顶', mo:23.6, ph:6.21, st:'low' },
+  { sn:'N03', loc:'东坡 · 坡顶', mo:22.5, ph:6.35, st:'low' },
+  { sn:'N04', loc:'东坡 · 坡中', mo:31.9, ph:6.10, st:'ok' },
+  { sn:'N05', loc:'东坡 · 坡中', mo:24.1, ph:6.16, st:'low' },
+  { sn:'N06', loc:'东坡 · 坡中', mo:25.7, ph:6.08, st:'warn' },
+  { sn:'N07', loc:'东坡 · 洼地', mo:35.5, ph:6.23, st:'ok' },
+  { sn:'N08', loc:'东坡 · 洼地', mo:33.1, ph:6.37, st:'off' },
+  { sn:'N09', loc:'西坡 · 水池边', mo:24.7, ph:6.18, st:'low' }
+];
+
+const COLORS = ['#3ee9b0','#4fd6ff','#ffc247','#a78bfa','#5ce7d0','#ff6b81','#8affc1','#7fb2ff','#ffd98a'];
+
+/* 迷你走势线（手绘 SVG，避免为小图再开 ECharts 实例） */
+function spark(vals, color) {
+  const w = 42, h = 14, min = Math.min(...vals), max = Math.max(...vals);
+  const span = max - min || 1;
+  const pts = vals.map((v, i) => `${(i / (vals.length - 1)) * w},${h - ((v - min) / span) * (h - 3) - 1.5}`).join(' ');
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round" opacity=".95"/></svg>`;
+}
+
+/* ============ 点位卡 ============ */
+document.getElementById('pts').innerHTML = POINTS.map((p, i) => {
+  const c = p.st === 'low' ? '#ff6b81' : p.st === 'warn' ? '#ffc247' : '#3ee9b0';
+  const lag = p.st === 'off' ? '离线 · 滞后 47 分钟' : '实时';
+  return `<div class="pt ${p.st === 'low' ? 'low' : p.st === 'warn' ? 'warn' : ''} ${p.st === 'off' ? 'off' : ''}">
+    <div class="bar" style="background:${c}"></div>
+    <div class="r1"><span class="dot" style="background:${c};box-shadow:0 0 8px ${c}"></span>${p.sn}
+      <span style="margin-left:auto;font-size:10.5px;opacity:.7">${p.loc.split(' · ')[1]}</span></div>
+    <div class="val" style="${p.st === 'ok' ? 'color:#eef4fb' : 'color:' + c}">${p.mo}<small>%</small></div>
+    <div class="r2"><span>${p.ph} pH</span>
+      <span style="display:flex;align-items:center;gap:7px">
+        <span class="rt">${lag}</span>
+        ${p.st === 'off' ? '' : `<span class="spark">${spark(seg(12, p.mo - 3, 0.9), c)}</span>`}
+      </span></div>
+  </div>`;
+}).join('');
+
+/* ============ 报警列表 ============ */
+const ALERTS = [
+  { sn:'N09', loc:'西坡 · 水池边', t:'20cm 土壤水分低于 25%', v:'24.7', th:'25', ago:'5 分钟前' },
+  { sn:'N05', loc:'东坡 · 坡中',   t:'20cm 土壤水分低于 25%', v:'24.1', th:'25', ago:'5 分钟前' },
+  { sn:'N03', loc:'东坡 · 坡顶',   t:'20cm 土壤水分低于 25%', v:'22.5', th:'25', ago:'5 分钟前' },
+  { sn:'N02', loc:'东坡 · 坡顶',   t:'20cm 土壤水分低于 25%', v:'23.6', th:'25', ago:'5 分钟前' }
+];
+document.getElementById('als').innerHTML = ALERTS.map(a => `
+  <div class="al ${Number(a.v) < 23 ? 'crit' : ''}">
+    <div class="t1"><span class="chip">告警</span><b>${a.sn}</b>
+      <span style="opacity:.65">${a.loc}</span>
+      <span style="margin-left:auto;font-size:11px;opacity:.6">${a.ago}</span></div>
+    <div class="t2">${a.t}　<span class="n">（当前 ${a.v} / 阈值 ${a.th}）</span></div>
+  </div>`).join('');
+
+/* ============ 图表：玻璃感的深色主题 ============ */
+const axisLabel = { color:'#6d84a3', fontSize:11 };
+const splitLine = { lineStyle:{ color:'rgba(255,255,255,.06)', type:'dashed' } };
+const tip = {
+  trigger:'axis',
+  backgroundColor:'rgba(12,18,32,.92)',
+  borderColor:'rgba(255,255,255,.16)',
+  borderWidth:1,
+  textStyle:{ color:'#eef4fb', fontSize:12 },
+  extraCssText:'backdrop-filter:blur(14px);border-radius:12px;box-shadow:0 18px 40px -14px rgba(0,0,0,.9)'
+};
+
+const hours = Array.from({length:36}, (_,i) => {
+  const m = 5*60 + i*10; const h = String(Math.floor(m/60)).padStart(2,'0'); const mm = String(m%60).padStart(2,'0');
+  return `${h}:${mm}`;
+});
+
+const soil = echarts.init(document.getElementById('chart-soil'));
+soil.setOption({
+  backgroundColor:'transparent',
+  grid:{ left:44, right:14, top:34, bottom:24 },
+  tooltip: tip,
+  legend:{ top:0, right:0, icon:'roundRect', itemWidth:9, itemHeight:9, itemGap:12,
+    textStyle:{ color:'#a8bdd6', fontSize:11 } },
+  xAxis:{ type:'category', boundaryGap:false, data:hours,
+    axisLine:{ lineStyle:{ color:'rgba(255,255,255,.1)' } }, axisTick:{show:false},
+    axisLabel:{ ...axisLabel, interval:5 }, splitLine:{show:false} },
+  yAxis:{ type:'value', min:10, max:48, name:'含水率 %',
+    nameTextStyle:{ color:'#6d84a3', fontSize:11 },
+    axisLine:{show:false}, axisTick:{show:false}, axisLabel, splitLine },
+  series: POINTS.map((p,i) => ({
+    name:p.sn, type:'line', smooth:true, symbol:'none', sampling:'lttb',
+    lineStyle:{ width:1.9, color:COLORS[i], shadowColor:COLORS[i], shadowBlur:9, shadowOffsetY:3 },
+    itemStyle:{ color:COLORS[i] },
+    data: seg(36, p.mo - 2, 1.15),
+    markLine: i===0 ? {
+      silent:true, symbol:'none',
+      lineStyle:{ color:'rgba(255,107,129,.65)', type:'dashed', width:1.3 },
+      label:{ formatter:'告警线 25%', color:'#ff6b81', fontSize:10.5, position:'insideStartTop' },
+      data:[{ yAxis:25 }]
+    } : undefined
+  }))
+});
+
+/* 温湿度：单轴（都是百分比量级接近，共轴才看得清走势） */
+const wx = echarts.init(document.getElementById('chart-wx'));
+wx.setOption({
+  backgroundColor:'transparent',
+  grid:{ left:34, right:8, top:12, bottom:20 },
+  tooltip: tip,
+  xAxis:{ type:'category', boundaryGap:true, data:hours,
+    axisLine:{ lineStyle:{ color:'rgba(255,255,255,.1)' } }, axisTick:{show:false},
+    axisLabel:{ ...axisLabel, interval:11, fontSize:10 }, splitLine:{show:false} },
+  yAxis:{ type:'value', min:5, max:100, axisLine:{show:false}, axisTick:{show:false},
+    axisLabel:{...axisLabel,fontSize:10}, splitLine },
+  series:[
+    { name:'气温', type:'line', smooth:true, symbol:'none',
+      lineStyle:{ width:2, color:'#ffc247', shadowColor:'#ffc247', shadowBlur:8 },
+      data: seg(36, 17, 0.5) },
+    { name:'湿度', type:'line', smooth:true, symbol:'none',
+      lineStyle:{ width:2, color:'#4fd6ff', shadowColor:'#4fd6ff', shadowBlur:8 },
+      data: (() => { let v = 88; return Array.from({length:36}, () => { v += (N()-0.5)*7; v = Math.max(62, Math.min(97, v)); return r1(v); }); })() }
+  ]
+});
+
+/* 降雨：独立窄条，单独一轴，柱子才看得出高度 */
+const rain = echarts.init(document.getElementById('chart-rain'));
+rain.setOption({
+  backgroundColor:'transparent',
+  grid:{ left:4, right:4, top:12, bottom:20 },
+  tooltip: { ...tip, trigger:'axis' },
+  xAxis:{ type:'category', boundaryGap:true, data:hours,
+    axisLine:{ lineStyle:{ color:'rgba(255,255,255,.1)' } }, axisTick:{show:false},
+    axisLabel:{show:false}, splitLine:{show:false} },
+  yAxis:{ type:'value', max:3, axisLine:{show:false}, axisTick:{show:false},
+    axisLabel:{...axisLabel,fontSize:9}, splitLine },
+  series:[{
+    name:'降雨', type:'bar', barMaxWidth:5,
+    itemStyle:{ color:'rgba(79,214,255,.7)', borderRadius:[3,3,0,0] },
+    data: hours.map((_,i)=> i>3&&i<9 ? r1(N()*2.2) : 0)
+  }]
+});
+
+addEventListener('resize', () => { soil.resize(); wx.resize(); rain.resize(); });
+</script>
+</body>
+</html>

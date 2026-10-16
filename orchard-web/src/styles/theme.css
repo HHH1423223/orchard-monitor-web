@@ -1,0 +1,1067 @@
+/* ===================================================================
+   山地果园监测平台 · 农业数据台账 主题
+   -------------------------------------------------------------------
+   设计方向：农业数据台账（纸感台账）
+     · 暖白纸底 + 1px 实线分区，全局无阴影、无渐变
+     · 标题衬线（Noto Serif SC）/ 正文无衬线 / 数据等宽（IBM Plex Mono）
+     · 圆角收敛到 2 / 3 / 6 / 8px，只有状态点与进度条用全圆
+   本文件是界面视觉的唯一依据，整体替换原 One UI 主题
+   （oneui.css 保留在磁盘上作为历史记录，已不再被任何文件引入）。
+   必须在 element-plus/dist/index.css 之后引入。
+   =================================================================== */
+
+:root {
+  /* ============ 1.1 底色与容器 ============ */
+  --paper: #f6f4ef;            /* 页面底色（纸） */
+  --surface: #fffefb;          /* 卡片 / 面板底色 */
+  --surface-sunken: #f1eee8;   /* 下沉容器：表格头、内嵌格、联锁格、气象格 */
+  --indigo-soft: #eaeefb;      /* 主色浅底：选中行、选中态 */
+  --moss-soft: #e9f1e8;        /* 苔绿浅底：正常态底 */
+  --ochre-soft: #fbf0dd;       /* 赭石浅底：注意态底 */
+  --vermilion-soft: #fbeae6;   /* 朱砂浅底：严重态底 */
+  --gold-soft: #fbf3dd;        /* 刺梨金浅底：高亮底 */
+
+  /* ============ 1.1 文字（三级 + 反白） ============ */
+  --ink: #1c1a17;              /* 主文字：标题、数值、表体 */
+  --ink-2: #55514a;            /* 次文字：说明、次级标签 */
+  --ink-3: #8b857a;            /* 弱文字：轴标签、单位、占位、辅助说明 */
+  --ink-inv: #fffefb;          /* 反白文字：深底上的文字 */
+
+  /* ============ 1.1 边框 ============ */
+  --hairline: #e2ddd2;         /* 结构边框：卡片、表格外框、输入框 */
+  --rule: #ece8df;             /* 内部分割线：表格行分隔、区块内分隔 */
+  --hairline-strong: #c9c2b3;  /* 强调边框：悬停、聚焦前的深一档 */
+
+  /* ============ 1.1 主色（靛蓝） ============ */
+  --indigo: #2f5fb8;           /* 主色：按钮、选中、链接、洼地分区 */
+  --indigo-deep: #23468a;      /* 主色深：文字型链接、悬停态 */
+
+  /* ============ 1.1 状态色 ============ */
+  --moss: #2e6e3e;             /* 苔绿：正常 / 在线 / 已处置 */
+  --moss-deep: #22522e;        /* 苔绿深 */
+  --ochre: #b8741a;            /* 赭石：注意 / 警告 / 告警 */
+  --ochre-deep: #8a5612;       /* 赭石深 */
+  --vermilion: #c2402f;        /* 朱砂：严重 / 危险 / 越限 */
+  --vermilion-deep: #923024;   /* 朱砂深 */
+
+  /* ============ 1.1 高亮色（刺梨金） ============ */
+  --gold: #d9a221;             /* 阈值线、当前时刻游标、关键强调 */
+  --gold-deep: #a67a12;        /* 刺梨金深 */
+
+  /* ============ 1.1 分区色（按 zone，已通过色觉校验，不得替换） ============ */
+  --zone-top: #b8741a;         /* 坡顶 · A 区（暖褐） */
+  --zone-mid: #2e6e3e;         /* 坡中 · B 区（苔绿） */
+  --zone-low: #2f5fb8;         /* 洼地 · C 区（靛蓝） */
+
+  /* ============ 1.2 字体栈 ============ */
+  --font-title: "Noto Serif SC", "Songti SC", "STSong", "SimSun", "Source Han Serif SC", serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+
+  /* ============ 1.3 间距 ============ */
+  --gap: 16px;              /* 栅格间距 */
+  --pad-card: 20px 22px;    /* 卡片内边距 */
+  --pad-page: 0 28px 40px;  /* 页面左右留白 */
+  --pad-cell: 10px 12px;    /* 表格单元格内边距 */
+
+  /* ============ 1.3 圆角 ============ */
+  --r-xs: 2px;
+  --r-sm: 3px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-pill: 999px;          /* 仅用于状态圆点与进度条 */
+
+  /* ============ 1.3 边框宽度（全局唯一值） ============ */
+  --bw: 1px;
+
+  /* ============ 1.4 阴影：全局无阴影 ============ */
+  /* 变量名保留、值全部为 none，以便沿用旧变量名的样式仍然合法 */
+  --el-1: none;
+  --el-2: none;
+  --el-3: none;
+
+  /* ============ 1.5 Element Plus 变量映射 ============ */
+  --el-color-primary: #2f5fb8;
+  --el-color-primary-light-3: #5c82ca;
+  --el-color-primary-light-5: #8ba5da;
+  --el-color-primary-light-7: #bac8e8;
+  --el-color-primary-light-8: #d2dbf1;
+  --el-color-primary-light-9: #eaeefb;
+  --el-color-primary-dark-2: #23468a;
+
+  --el-color-success: #2e6e3e;
+  --el-color-success-light-3: #5d8f6a;
+  --el-color-success-light-5: #8cb095;
+  --el-color-success-light-7: #bbd1c0;
+  --el-color-success-light-8: #d3e1d7;
+  --el-color-success-light-9: #e9f1e8;
+  --el-color-success-dark-2: #22522e;
+
+  --el-color-warning: #b8741a;
+  --el-color-warning-light-3: #c99352;
+  --el-color-warning-light-5: #dbb289;
+  --el-color-warning-light-7: #ecd1c0;
+  --el-color-warning-light-8: #f5e1d7;
+  --el-color-warning-light-9: #fbf0dd;
+  --el-color-warning-dark-2: #8a5612;
+
+  --el-color-danger: #c2402f;
+  --el-color-danger-light-3: #d07367;
+  --el-color-danger-light-5: #dea59e;
+  --el-color-danger-light-7: #ecd8d5;
+  --el-color-danger-light-8: #f5e4e1;
+  --el-color-danger-light-9: #fbeae6;
+  --el-color-danger-dark-2: #923024;
+
+  --el-color-error: #c2402f;
+  --el-color-error-light-9: #fbeae6;
+
+  --el-color-info: #55514a;
+  --el-color-info-light-3: #807c75;
+  --el-color-info-light-5: #aaa7a2;
+  --el-color-info-light-7: #d5d3d0;
+  --el-color-info-light-8: #eae9e7;
+  --el-color-info-light-9: #f1eee8;
+
+  --el-text-color-primary: #1c1a17;
+  --el-text-color-regular: #55514a;
+  --el-text-color-secondary: #8b857a;
+  --el-text-color-placeholder: #8b857a;
+  --el-text-color-disabled: #b8b2a7;
+
+  --el-border-color: #e2ddd2;
+  --el-border-color-light: #ece8df;
+  --el-border-color-lighter: #ece8df;
+  --el-border-color-extra-light: #f1eee8;
+  --el-border-color-dark: #c9c2b3;
+  --el-border-color-darker: #c9c2b3;
+
+  --el-fill-color: #f1eee8;
+  --el-fill-color-light: #f6f4ef;
+  --el-fill-color-lighter: #faf8f4;
+  --el-fill-color-blank: #fffefb;
+
+  --el-bg-color: #fffefb;
+  --el-bg-color-page: #f6f4ef;
+  --el-bg-color-overlay: #fffefb;
+
+  --el-border-radius-base: 3px;
+  --el-border-radius-small: 3px;
+  --el-border-radius-round: 3px;
+  --el-border-radius-circle: 50%;
+
+  --el-font-family: "Inter", system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --el-font-size-base: 14px;
+
+  --el-box-shadow: none;
+  --el-box-shadow-light: none;
+  --el-box-shadow-lighter: none;
+  --el-box-shadow-dark: none;
+}
+
+/* -------------------------------------------------------------------
+   兼容别名：旧 oneui.css 变量名 → 新 token
+   App.vue / Login.vue / 五个视图的 scoped 样式按手册要求保持原样，
+   其中仍引用这些旧变量名，这里统一映射到新色板，避免取值失效。
+   ------------------------------------------------------------------- */
+:root {
+  --bg: var(--paper);
+  --card: var(--surface);
+  --fill: var(--surface-sunken);
+  --line: var(--hairline);
+  --divider: var(--rule);
+
+  --accent: var(--indigo);
+  --accent-deep: var(--indigo-deep);
+  --accent-soft: var(--indigo-soft);
+  --accent-glow: var(--indigo-soft);
+
+  --blue: var(--indigo);
+  --blue-deep: var(--indigo-deep);
+  --blue-soft: var(--indigo-soft);
+
+  --amber: var(--ochre);
+  --amber-deep: var(--ochre-deep);
+  --amber-soft: var(--ochre-soft);
+
+  --rose: var(--vermilion);
+  --rose-deep: var(--vermilion-deep);
+  --rose-soft: var(--vermilion-soft);
+
+  --violet: var(--indigo);
+  --ink-4: var(--ink-3);
+}
+
+/* ===================================================================
+   基础排版
+   =================================================================== */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.card-head h3,
+.brand .txt b,
+.bp-mid h2 {
+  font-family: var(--font-title);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: 22px;
+}
+
+h2,
+.card-head h3 {
+  font-size: 17px;
+}
+
+/* ============ 布局外壳 ============ */
+.app-shell {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 252px;
+  flex: 0 0 252px;
+  background: var(--surface);
+  border-right: var(--bw) solid var(--hairline);
+  padding: 26px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s ease, flex-basis 0.2s ease;
+}
+.sidebar.collapsed {
+  width: 76px;
+  flex-basis: 76px;
+}
+
+/* 移动端（≤768px）侧栏展开时的遮罩层，点击同样收起（第 8.3 节） */
+.mobile-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(28, 26, 23, 0.32);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px 26px;
+}
+.brand .logo {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: var(--r-sm);
+  background: var(--indigo);
+  display: grid;
+  place-items: center;
+  color: var(--ink-inv);
+  font-weight: 700;
+  font-size: 19px;
+}
+.brand .txt b {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.brand .txt span {
+  font-size: 12px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 15px;
+  border-radius: var(--r-sm);
+  color: var(--ink-2);
+  text-decoration: none;
+  font-size: 14.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.18s, color 0.18s;
+}
+.nav-item:hover {
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+.nav-item.active {
+  background: var(--indigo-soft);
+  color: var(--indigo-deep);
+  font-weight: 700;
+}
+.nav-item .badge {
+  margin-left: auto;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: var(--vermilion-soft);
+  color: var(--vermilion);
+}
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 13px 0;
+}
+.sidebar.collapsed .txt,
+.sidebar.collapsed .brand .txt,
+.sidebar.collapsed .nav-item span.label,
+.sidebar.collapsed .side-foot {
+  display: none;
+}
+
+.side-foot {
+  margin-top: auto;
+  padding: 16px 17px;
+  border-radius: var(--r-sm);
+  background: var(--surface-sunken);
+  border: var(--bw) solid var(--rule);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.85;
+}
+.side-foot .t {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--indigo);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.side-foot .s {
+  color: var(--ink-3);
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 68px;
+  flex: 0 0 68px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 28px;
+  background: var(--paper);
+}
+.topbar h1 {
+  font-size: 22px;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.topbar .spacer {
+  flex: 1;
+}
+.topbar .clock {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.page {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--pad-page);
+}
+
+/* ============ 卡片 ============ */
+.card {
+  background: var(--surface);
+  border: var(--bw) solid var(--hairline);
+  border-radius: var(--r-md);
+  padding: var(--pad-card);
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.card-head h3 {
+  margin: 0;
+}
+.card-head .spacer {
+  flex: 1;
+}
+.card-head .hint {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+.grid {
+  display: grid;
+  gap: var(--gap);
+}
+.grid.k4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.grid.k3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.grid.k2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (max-width: 1240px) {
+  .grid.k4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  /* 8.2 中等宽度新增：3 列改 2 列、表格外层容器横向滚动 */
+  .grid.k3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .card {
+    overflow-x: auto;
+  }
+}
+
+/* ============ KPI 卡 ============ */
+.kpi {
+  background: var(--surface);
+  border: var(--bw) solid var(--hairline);
+  border-radius: var(--r-md);
+  padding: var(--pad-card);
+}
+.kpi .k-label {
+  font-family: var(--font-title);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.kpi .k-label .ic {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--indigo-soft);
+  color: var(--indigo-deep);
+}
+.kpi.warn .k-label .ic {
+  background: var(--ochre-soft);
+  color: var(--ochre-deep);
+}
+.kpi.bad .k-label .ic {
+  background: var(--vermilion-soft);
+  color: var(--vermilion-deep);
+}
+.kpi.info .k-label .ic {
+  background: var(--surface-sunken);
+  color: var(--ink-2);
+}
+.kpi .k-value {
+  font-family: var(--font-num);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 14px 0 3px;
+  font-variant-numeric: tabular-nums;
+}
+.kpi .k-value small {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink-3);
+  margin-left: 3px;
+}
+.kpi .k-foot {
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+.kpi .track {
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--rule);
+  margin-top: 14px;
+  overflow: hidden;
+}
+.kpi .track i {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--indigo);
+}
+.kpi.warn .track i {
+  background: var(--ochre);
+}
+.kpi.bad .track i {
+  background: var(--vermilion);
+}
+.kpi.info .track i {
+  background: var(--ink-3);
+}
+
+/* ============ 点位卡 ============ */
+/* 墒情点位卡里的坡面剖面图容器（第 7.1 节新增） */
+.slope-wrap {
+  margin-bottom: var(--gap);
+  padding-bottom: var(--gap);
+  border-bottom: var(--bw) solid var(--rule);
+}
+
+.pts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 13px;
+}
+.pt {
+  padding: 16px 17px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: var(--bw) solid var(--hairline);
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+.pt:hover {
+  border-color: var(--hairline-strong);
+}
+.pt.warn {
+  background: var(--ochre-soft);
+}
+.pt.low {
+  background: var(--vermilion-soft);
+}
+.pt.offline {
+  background: var(--surface-sunken);
+}
+.pt .pt-top {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.pt .pt-top .loc {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.pt .pt-val {
+  font-family: var(--font-num);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin: 12px 0 2px;
+}
+.pt .pt-val small {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink-3);
+  margin-left: 3px;
+}
+.pt.warn .pt-val {
+  color: var(--ochre-deep);
+}
+.pt.low .pt-val {
+  color: var(--vermilion);
+}
+.pt .track {
+  height: 5px;
+  border-radius: var(--r-pill);
+  background: var(--rule);
+  margin-top: 10px;
+  overflow: hidden;
+}
+.pt .track i {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--moss);
+}
+.pt.warn .track i {
+  background: var(--ochre);
+}
+.pt.low .track i {
+  background: var(--vermilion);
+}
+.pt .pt-sub {
+  font-size: 12px;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 9px;
+}
+
+/* 状态点：在线带苔绿光圈（全局仅允许的两处 box-shadow 之一） */
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 8px;
+  background: var(--moss);
+  box-shadow: 0 0 0 3px var(--moss-soft);
+}
+.dot.off {
+  background: var(--ink-3);
+  box-shadow: none;
+}
+.dot.warn {
+  background: var(--ochre);
+  box-shadow: none;
+}
+.dot.bad {
+  background: var(--vermilion);
+  box-shadow: none;
+}
+
+/* ============ 提示条 / 报警条 ============ */
+.alert-strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 17px 22px;
+  border-radius: var(--r-sm);
+  border: var(--bw) solid var(--hairline);
+  background: var(--surface);
+  margin-bottom: var(--gap);
+  font-size: 13.5px;
+}
+.alert-strip .ic {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--surface);
+  border: var(--bw) solid var(--hairline);
+}
+.alert-strip.ok {
+  background: var(--moss-soft);
+  color: var(--moss-deep);
+}
+.alert-strip.ok .ic {
+  color: var(--moss);
+}
+.alert-strip.warn {
+  background: var(--ochre-soft);
+  color: var(--ochre-deep);
+}
+.alert-strip.warn .ic {
+  color: var(--ochre);
+}
+.alert-strip.critical {
+  background: var(--vermilion-soft);
+  color: var(--vermilion-deep);
+}
+.alert-strip.critical .ic {
+  color: var(--vermilion);
+}
+.alert-strip b {
+  font-weight: 700;
+}
+
+/* ============ 报警行 ============ */
+.al-row,
+.alert-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 15px 17px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: var(--bw) solid var(--hairline);
+  margin-bottom: 11px;
+}
+.al-row.crit,
+.alert-row.critical {
+  background: var(--vermilion-soft);
+}
+.al-row .ic,
+.alert-row .ic {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: var(--r-sm);
+  background: var(--ochre-soft);
+  color: var(--ochre-deep);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+.al-row.crit .ic,
+.alert-row.critical .ic {
+  background: var(--surface);
+  color: var(--vermilion);
+}
+.al-row .bd,
+.alert-row .bd {
+  flex: 1;
+  min-width: 0;
+}
+.al-row .l1,
+.alert-row .ar-top {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13.5px;
+}
+.al-row .l1 b,
+.alert-row .ar-top b {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.al-row .l1 .lo,
+.alert-row .ar-top .lo {
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+.al-row .l1 .ago,
+.alert-row .ar-top .ago {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.al-row .l2,
+.alert-row .ar-body {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin-top: 4px;
+}
+.al-row .l2 .n,
+.alert-row .ar-body .n {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============ 底部统计（细实线分隔，不用竖线） ============ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: var(--bw) solid var(--rule);
+}
+.stats .s .v {
+  font-family: var(--font-num);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.stats .s .l {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* ============ 工具类 ============ */
+.mono {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+.muted {
+  color: var(--ink-2);
+}
+.dim {
+  color: var(--ink-3);
+}
+.nowrap {
+  white-space: nowrap;
+}
+
+/* ===================================================================
+   Element Plus 适配
+   要点：去掉默认阴影与胶囊圆角，容器一律用 1px 实线分区
+   =================================================================== */
+
+/* 卡片化容器：细实线边框，无阴影 */
+.el-card {
+  border: var(--bw) solid var(--hairline) !important;
+  border-radius: var(--r-md) !important;
+  box-shadow: none !important;
+}
+
+/* 表格：表头下沉底、行分隔细实线、悬停用主色浅底 */
+.el-table {
+  --el-table-border-color: var(--rule);
+  --el-table-header-bg-color: var(--surface-sunken);
+  --el-table-row-hover-bg-color: var(--indigo-soft);
+  --el-table-text-color: var(--ink);
+  --el-table-header-text-color: var(--ink-2);
+  background: transparent;
+}
+.el-table th.el-table__cell {
+  font-weight: 600;
+  font-size: 12.5px;
+}
+.el-table th.el-table__cell,
+.el-table td.el-table__cell {
+  /* --pad-cell 的纵向值（10px），横向 12px 由 Element Plus 的 .cell 内边距提供 */
+  padding: 10px 0;
+}
+.el-table td.el-table__cell {
+  border-bottom: var(--bw) solid var(--rule) !important;
+}
+.el-table .mono {
+  font-size: 13px;
+}
+.el-table::before,
+.el-table--border::after {
+  display: none;
+}
+
+/* 输入类控件：白底 + 1px 实线边框 */
+.el-input__wrapper,
+.el-textarea__inner {
+  border-radius: var(--r-sm);
+  border: var(--bw) solid var(--hairline);
+  background: var(--surface);
+  box-shadow: none !important;
+}
+.el-textarea__inner {
+  border-radius: var(--r-sm);
+}
+.el-input__wrapper.is-focus {
+  border-color: var(--indigo);
+  /* 聚焦环：全局仅允许的两处 box-shadow 之二 */
+  box-shadow: 0 0 0 2px var(--indigo-soft) !important;
+  background: var(--surface);
+}
+.el-input-number .el-input__wrapper {
+  border-radius: var(--r-sm);
+}
+
+/* 按钮：直角小圆角 + 细实线边框 */
+.el-button {
+  border-radius: var(--r-sm);
+  font-weight: 600;
+  border: var(--bw) solid var(--hairline);
+}
+.el-button--default {
+  background: var(--surface);
+  color: var(--ink-2);
+}
+.el-button--default:hover {
+  background: var(--surface-sunken);
+  color: var(--ink);
+  border-color: var(--hairline-strong);
+}
+.el-button--primary {
+  background: var(--indigo);
+  border-color: var(--indigo);
+  color: var(--ink-inv);
+}
+.el-button--primary:hover,
+.el-button--primary:focus,
+.el-button--primary:active {
+  background: var(--indigo-deep);
+  border-color: var(--indigo-deep);
+  color: var(--ink-inv);
+}
+.el-button--danger {
+  border-color: var(--vermilion);
+}
+
+/* 选择器 / 分段控件 */
+.el-select__wrapper {
+  border-radius: var(--r-sm);
+  border: var(--bw) solid var(--hairline);
+  background: var(--surface);
+  box-shadow: none !important;
+}
+.el-select__wrapper.is-focused {
+  border-color: var(--indigo);
+}
+.el-radio-button__inner {
+  border-radius: 0;
+  outline: var(--bw) solid var(--hairline);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-weight: 600;
+  box-shadow: none !important;
+}
+.el-radio-button:first-child .el-radio-button__inner {
+  border-radius: var(--r-sm) 0 0 var(--r-sm);
+}
+.el-radio-button:last-child .el-radio-button__inner {
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+.el-radio-button__original-radio:checked + .el-radio-button__inner {
+  background: var(--indigo);
+  outline-color: var(--indigo);
+  color: var(--ink-inv);
+  box-shadow: none !important;
+}
+
+/* 标签：柔和浅底 + 小圆角 */
+.el-tag {
+  border-radius: var(--r-sm);
+  border: var(--bw) solid transparent;
+  font-weight: 600;
+}
+.el-tag--primary {
+  background: var(--indigo-soft);
+  border-color: var(--indigo-soft);
+  color: var(--indigo-deep);
+}
+.el-tag--success {
+  background: var(--moss-soft);
+  border-color: var(--moss-soft);
+  color: var(--moss-deep);
+}
+.el-tag--warning {
+  background: var(--ochre-soft);
+  border-color: var(--ochre-soft);
+  color: var(--ochre-deep);
+}
+.el-tag--danger {
+  background: var(--vermilion-soft);
+  border-color: var(--vermilion-soft);
+  color: var(--vermilion-deep);
+}
+.el-tag--info {
+  background: var(--surface-sunken);
+  border-color: var(--surface-sunken);
+  color: var(--ink-2);
+}
+
+/* 弹窗 / 抽屉：细实线边框，无阴影（阴影变量已映射为 none） */
+.el-dialog,
+.el-drawer {
+  border: var(--bw) solid var(--hairline);
+  border-radius: var(--r-md);
+}
+.el-drawer {
+  border-radius: var(--r-md) 0 0 var(--r-md);
+}
+
+.el-descriptions {
+  --el-descriptions-item-bordered-label-background: var(--surface-sunken);
+  --el-border-color-lighter: var(--rule);
+}
+
+.el-tabs__nav-wrap::after {
+  background-color: var(--rule);
+}
+.el-tabs__item.is-active {
+  color: var(--indigo);
+  font-weight: 700;
+}
+
+.el-alert {
+  border-radius: var(--r-sm);
+  border: var(--bw) solid var(--hairline);
+}
+
+.el-checkbox__input.is-checked .el-checkbox__inner {
+  background: var(--indigo);
+  border-color: var(--indigo);
+}
+
+/* ===================================================================
+   响应式（第 8 章）
+   断点：1240（中等宽度，见上方 .grid 处）/ 1024 / 768 / 480
+   =================================================================== */
+
+/* ---------- 1024px：桌面与平板分界（第 8.1 节） ----------
+   第 8.2 节的行为表只定义了 >1240 / 769–1240 / 481–768 / ≤480 四档，
+   没有为 1024 档规定任何行为，因此这里只保留断点声明占位、不新增样式；
+   1025–1240 与 769–1024 均沿用 1240 档规则。 */
+@media (max-width: 1024px) {
+}
+
+/* ---------- 768px：平板竖屏 / 大屏手机（481–768px，第 8.2 / 8.3 节）---------- */
+@media (max-width: 768px) {
+  /* 折叠态：留在文档流里的 76px 图标条 */
+  .sidebar.collapsed {
+    width: 76px;
+    flex: 0 0 76px;
+  }
+  /* 展开态：覆盖层，不挤压主内容宽度（z-index 高于遮罩层） */
+  .sidebar:not(.collapsed) {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    z-index: 50;
+  }
+  /* 全部栅格改单列（KPI 条随之纵向堆叠） */
+  .grid.k4,
+  .grid.k3,
+  .grid.k2 {
+    grid-template-columns: 1fr;
+  }
+  /* 表格横向滚动，触屏滚动更顺 */
+  .card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ---------- 480px：手机竖屏（≤480px，第 8.2 节）---------- */
+@media (max-width: 480px) {
+  .kpi {
+    padding: 16px 16px;
+  }
+  /* 顶栏只留必要信息：隐藏时钟与「演示数据」标签 */
+  .topbar .clock,
+  .topbar .el-tag--warning {
+    display: none;
+  }
+}
